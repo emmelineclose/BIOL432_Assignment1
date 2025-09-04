@@ -1,0 +1,90 @@
+---
+title: "Assignment1"
+author: "Emmeline Close"
+date: "2025-09-04"
+output: html_document
+---
+
+Link to GitHub Repository: https://github.com/emmelineclose/BIOL432_Assignment1
+
+## Setup
+
+Load libraries
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+## Running Previous R Scripts
+
+Script that generates 100 instances of five species with generated limb lengths and widths as observed by 3 observers
+
+```{r, echo=FALSE}
+source("dataGenerato.R")
+```
+
+Script that calculates the leg volume for the previously mentioned 100 iterations of five species
+
+```{r, echo=FALSE}
+source("volumeEstimato.R")
+```
+
+## Importing Data
+
+Load revised measurements.csv
+
+```{r}
+Measurements<-read.csv("./measurements.csv")
+```
+
+## Analyzing Data
+
+Sort the data by species using dplyr
+
+```{r}
+Measurements_arranged<- Measurements %>%
+  arrange(Organism, Observer, Volume)
+Measurements_arranged
+```
+
+Table that shows the average volume for each species
+
+```{r}
+Volume_average_table <- Measurements %>%
+  group_by(Organism) %>%
+  summarize(Avg_volume = mean(Volume, na.rm = TRUE))
+
+Volume_average_table
+```
+
+Table that shows the number of observations for each combination of species and observer
+
+```{r}
+Observations_table <- Measurements %>%
+  count(Organism, Observer)
+
+Observations_table
+```
+
+## Visualizing Data
+
+Single box plot to compare key features of the distributions of volumes for each species
+
+```{r}
+ggplot(Measurements, aes(x = Organism, y = Volume)) + geom_boxplot() +
+  labs(
+    x = "Species",
+    y = "Limb Volume",
+    title = "Distribution of Limb Volume by Species"
+  )
+```
+
+Multi-panel plot showing frequency histograms showing the distribution of limb volume for each species
+
+```{r}
+ggplot(Measurements, aes(x = Volume)) +
+  geom_histogram(bins = 30, boundary = 0) + # same bins across panels
+  facet_wrap(~ Organism, ncol = 3) + # one panel per species
+  labs(x = "Limb Volume", y = "Frequency", title = "Limb Volume Distributions by Species")
+```
